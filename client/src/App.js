@@ -12,11 +12,11 @@ const Container = styled.div`
 `;
 
 const Main = styled.div`
-  flex: 7;
+  flex: 6;
   background-color: ${({ theme }) => theme.bg};
 `;
 const Wrapper = styled.div`
-  padding: 22px 96px;
+  padding: 22px 56px;
 `;
 
 function App() {
@@ -31,9 +31,9 @@ function App() {
             <Wrapper>
               <Routes>
                 <Route path="/">
-                  <Route index element={<Home/>} />
+                  <Route index element={<Home />} />
                   <Route path="video">
-                    <Route path=":id" element={<Video/>} />
+                    <Route path=":id" element={<Video />} />
                   </Route>
                 </Route>
               </Routes>
