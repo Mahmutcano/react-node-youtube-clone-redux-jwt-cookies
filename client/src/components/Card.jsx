@@ -20,8 +20,8 @@ const Image = styled.img`
 
 const Details = styled.div`
   display: flex;
-  margin-top: ${(props) => props.type !== "sm" && "16px"}
-  gap: 12px;
+  margin-top: ${(props) => props.type !== "sm" && "18px"}
+  gap: 10px;
   flex:1;
 `;
 
