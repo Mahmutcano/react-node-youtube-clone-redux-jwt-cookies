@@ -12,6 +12,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { useLocation } from "react-router-dom";
 import axios from "axios";
 import { dislike, fetchSuccess, like } from "../redux/videoSlice";
+import { subscription } from "../redux/userSlice";
 import TimeAgo from "react-timeago";
 import L10nsStrings from "react-timeago/lib/language-strings/tr";
 import buildFormatter from "react-timeago/lib/formatters/buildFormatter";
@@ -140,12 +141,19 @@ const Video = () => {
 
   const handleLike = async () => {
     await axios.put(`/users/like/${currentVideo.currentVideo._id}`);
-    dispatch(like(currentUser._id))
+    dispatch(like(currentUser._id));
   };
 
   const handleDislike = async () => {
     await axios.put(`/users/dislike/${currentVideo.currentVideo._id}`);
-    dispatch(dislike(currentUser._id))
+    dispatch(dislike(currentUser._id));
+  };
+
+  const handleSub = async () => {
+    currentUser.currentUser.subscribedUsers.includes(channel._id)
+      ? await axios.put(`/users/unsub/${channel._id}`)
+      : await axios.put(`/users/sub/${channel._id}`);
+    dispatch(subscription(channel._id));
   };
 
   return (
@@ -165,7 +173,7 @@ const Video = () => {
         <Title>{currentVideo.currentVideo.title}</Title>
         <Details>
           <Info>
-            {currentVideo.currentVideo.views} •{" "}
+            {currentVideo.currentVideo.views} views •{" "}
             <TimeAgo
               date={currentVideo.currentVideo.createdAt}
               formatter={formatter}
@@ -208,7 +216,11 @@ const Video = () => {
               <Description>{currentVideo.currentVideo.desc}</Description>
             </ChannelDetail>
           </ChannelInfo>
-          <Subscribe>SUBSCRIBE</Subscribe>
+          <Subscribe onClick={handleSub}>
+            {currentUser.currentUser.subscribedUsers?.includes(channel._id)
+              ? "SUBSCRIBED"
+              : "SUBSCRIBE"}
+          </Subscribe>
         </Channel>
         <Hr />
         <Comments />
