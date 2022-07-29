@@ -1,7 +1,12 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import styled from "styled-components";
-import Profile from "../img/profile.png";
 import { Link } from "react-router-dom";
+import axios from "axios";
+import TimeAgo from "react-timeago";
+import L10nsStrings from "react-timeago/lib/language-strings/tr";
+import buildFormatter from "react-timeago/lib/formatters/buildFormatter";
+
+const formatter = buildFormatter(L10nsStrings);
 
 const Container = styled.div`
   width: ${(props) => props.type !== "sm" && "360px"};
@@ -52,20 +57,29 @@ const Info = styled.div`
   color: ${({ theme }) => theme.textSoft};
 `;
 
-const Card = ({ type }) => {
+const Card = ({ type, video }) => {
+  const [channel, setChannel] = useState({});
+
+  useEffect(() => {
+    const fetchChannel = async () => {
+      const res = await axios.get(`/users/find/${video.userId}`);
+      setChannel(res.data);
+    };
+    fetchChannel();
+  }, [video.userId]);
   return (
     <Link to="/video/test" style={{ textDecoration: "none" }}>
       <Container type={type}>
-        <Image
-          type={type}
-          src="https://assets-global.website-files.com/616e938268c8f0a92cb2b540/617806fb52d751a1fab3898a_youtube%20banner%20size%20guide-p-800.jpeg"
-        />
+        <Image type={type} src={video.imgUrl} />
         <Details type={type}>
-          <ChannelImage type={type} src={Profile} />
+          <ChannelImage type={type} src={channel.img} />
           <Texts>
-            <Title>Test Video</Title>
-            <ChannelName>Mahmut Can</ChannelName>
-            <Info>550,852 views & 1 day ago</Info>
+            <Title>{video.title}</Title>
+            <ChannelName>{channel.name}</ChannelName>
+            <Info>
+              {video.views} &#8226; {""}
+              <TimeAgo date={channel.createdAt} formatter={formatter} />
+            </Info>
           </Texts>
         </Details>
       </Container>
