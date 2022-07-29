@@ -1,12 +1,22 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 import ThumbUpOutlinedIcon from "@mui/icons-material/ThumbUpOutlined";
 import ThumbDownOffAltOutlinedIcon from "@mui/icons-material/ThumbDownOffAltOutlined";
 import ReplyOutlinedIcon from "@mui/icons-material/ReplyOutlined";
 import AddTaskOutlinedIcon from "@mui/icons-material/AddTaskOutlined";
+import ThumbDownIcon from "@mui/icons-material/ThumbDown";
+import ThumbUpIcon from "@mui/icons-material/ThumbUp";
 import Card from "../components/Card";
-import Profile from "../img/profile.png";
 import Comments from "../components/Comments";
+import { useDispatch, useSelector } from "react-redux";
+import { useLocation } from "react-router-dom";
+import axios from "axios";
+import { dislike, fetchSuccess, like } from "../redux/videoSlice";
+import TimeAgo from "react-timeago";
+import L10nsStrings from "react-timeago/lib/language-strings/tr";
+import buildFormatter from "react-timeago/lib/formatters/buildFormatter";
+
+const formatter = buildFormatter(L10nsStrings);
 
 const Container = styled.div`
   display: flex;
@@ -106,6 +116,38 @@ const Subscribe = styled.button`
 `;
 
 const Video = () => {
+  const currentUser = useSelector((state) => state.user);
+  const currentVideo = useSelector((state) => state.video);
+  const dispatch = useDispatch();
+
+  const path = useLocation().pathname.split("/")[2];
+
+  const [channel, setChannel] = useState({});
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const videoRes = await axios.get(`/videos/find/${path}`);
+        const channelRes = await axios.get(
+          `/users/find/${videoRes.data.userId}`
+        );
+        setChannel(channelRes.data);
+        dispatch(fetchSuccess(videoRes.data));
+      } catch (err) {}
+    };
+    fetchData();
+  }, [path, dispatch]);
+
+  const handleLike = async () => {
+    await axios.put(`/users/like/${currentVideo.currentVideo._id}`);
+    dispatch(like(currentUser._id))
+  };
+
+  const handleDislike = async () => {
+    await axios.put(`/users/dislike/${currentVideo.currentVideo._id}`);
+    dispatch(dislike(currentUser._id))
+  };
+
   return (
     <Container>
       <Content>
@@ -120,15 +162,33 @@ const Video = () => {
             allowfullscreen
           ></iframe>
         </VideoWrapper>
-        <Title>Test Video</Title>
+        <Title>{currentVideo.currentVideo.title}</Title>
         <Details>
-          <Info>7,948,154 views • Jun 22, 2022</Info>
+          <Info>
+            {currentVideo.currentVideo.views} •{" "}
+            <TimeAgo
+              date={currentVideo.currentVideo.createdAt}
+              formatter={formatter}
+            />
+          </Info>
           <Buttons>
-            <Button>
-              <ThumbUpOutlinedIcon /> 123
+            <Button onClick={handleLike}>
+              {currentVideo.currentVideo.likes?.includes(currentUser?._id) ? (
+                <ThumbUpIcon />
+              ) : (
+                <ThumbUpOutlinedIcon />
+              )}{" "}
+              {currentVideo.currentVideo.likes?.length}
             </Button>
-            <Button>
-              <ThumbDownOffAltOutlinedIcon /> Dislike
+            <Button onClick={handleDislike}>
+              {currentVideo.currentVideo.dislikes?.includes(
+                currentUser?._id
+              ) ? (
+                <ThumbDownIcon />
+              ) : (
+                <ThumbDownOffAltOutlinedIcon />
+              )}{" "}
+              Dislike
             </Button>
             <Button>
               <ReplyOutlinedIcon /> Share
@@ -141,16 +201,11 @@ const Video = () => {
         <Hr />
         <Channel>
           <ChannelInfo>
-            <Image src={Profile} />
+            <Image src={channel.img} />
             <ChannelDetail>
-              <ChannelName>Mahmut Can</ChannelName>
-              <ChannelCounter>200K subscribers</ChannelCounter>
-              <Description>
-                Lorem ipsum dolor, sit amet consectetur adipisicing elit.
-                Doloribus laborum delectus unde quaerat dolore culpa sit aliquam
-                at. Vitae facere ipsum totam ratione exercitationem. Suscipit
-                animi accusantium dolores ipsam ut.
-              </Description>
+              <ChannelName>{channel.name}</ChannelName>
+              <ChannelCounter>{channel.subscribers} subscribers</ChannelCounter>
+              <Description>{currentVideo.currentVideo.desc}</Description>
             </ChannelDetail>
           </ChannelInfo>
           <Subscribe>SUBSCRIBE</Subscribe>
@@ -158,7 +213,7 @@ const Video = () => {
         <Hr />
         <Comments />
       </Content>
-      <Recommendation>
+      {/* <Recommendation>
         <Card type="sm" />
         <Card type="sm" />
         <Card type="sm" />
@@ -168,7 +223,7 @@ const Video = () => {
         <Card type="sm" />
         <Card type="sm" />
         <Card type="sm" />
-      </Recommendation>
+      </Recommendation> */}
     </Container>
   );
 };
