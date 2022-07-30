@@ -6,7 +6,6 @@ import ReplyOutlinedIcon from "@mui/icons-material/ReplyOutlined";
 import AddTaskOutlinedIcon from "@mui/icons-material/AddTaskOutlined";
 import ThumbDownIcon from "@mui/icons-material/ThumbDown";
 import ThumbUpIcon from "@mui/icons-material/ThumbUp";
-import Card from "../components/Card";
 import Comments from "../components/Comments";
 import { useDispatch, useSelector } from "react-redux";
 import { useLocation } from "react-router-dom";
@@ -16,6 +15,7 @@ import { subscription } from "../redux/userSlice";
 import TimeAgo from "react-timeago";
 import L10nsStrings from "react-timeago/lib/language-strings/tr";
 import buildFormatter from "react-timeago/lib/formatters/buildFormatter";
+import Recommendation from "../components/Recommendation";
 
 const formatter = buildFormatter(L10nsStrings);
 
@@ -65,9 +65,6 @@ const Hr = styled.hr`
   border: 0.5px solid ${({ theme }) => theme.soft};
 `;
 
-const Recommendation = styled.div`
-  flex: 2;
-`;
 const Channel = styled.div`
   display: flex;
   justify-content: space-between;
@@ -165,7 +162,7 @@ const Video = () => {
     <Container>
       <Content>
         <VideoWrapper>
-          <VideoFrame src={currentVideo.videoUrl} />
+          <VideoFrame src={currentVideo.currentVideo.videoUrl} controls/>
         </VideoWrapper>
         <Title>{currentVideo.currentVideo.title}</Title>
         <Details>
@@ -220,19 +217,9 @@ const Video = () => {
           </Subscribe>
         </Channel>
         <Hr />
-        <Comments videoId={currentVideo._id}/>
+        <Comments videoId={currentVideo.currentVideo._id}/>
       </Content>
-      {/* <Recommendation>
-        <Card type="sm" />
-        <Card type="sm" />
-        <Card type="sm" />
-        <Card type="sm" />
-        <Card type="sm" />
-        <Card type="sm" />
-        <Card type="sm" />
-        <Card type="sm" />
-        <Card type="sm" />
-      </Recommendation> */}
+      <Recommendation tags={currentVideo.currentVideo.tags} />
     </Container>
   );
 };
