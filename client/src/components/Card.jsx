@@ -20,7 +20,7 @@ const Image = styled.img`
   width: 100%;
   height: ${(props) => (props.type === "sm" ? "120px" : "202px")};
   background-color: #999;
-  flex: 1;
+  flex: 0.1;
 `;
 
 const Details = styled.div`
