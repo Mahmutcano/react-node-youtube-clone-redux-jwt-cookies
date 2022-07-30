@@ -156,19 +156,16 @@ const Video = () => {
     dispatch(subscription(channel._id));
   };
 
+  const VideoFrame = styled.video`
+    max-height: 720px;
+    width: 100%;
+    object-fit: cover;
+  `;
   return (
     <Container>
       <Content>
         <VideoWrapper>
-          <iframe
-            width="100%"
-            height="520"
-            src="https://www.youtube.com/embed/k3Vfj-e1Ma4"
-            title="YouTube video player"
-            frameborder="0"
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-            allowfullscreen
-          ></iframe>
+          <VideoFrame src={currentVideo.videoUrl} />
         </VideoWrapper>
         <Title>{currentVideo.currentVideo.title}</Title>
         <Details>
@@ -223,7 +220,7 @@ const Video = () => {
           </Subscribe>
         </Channel>
         <Hr />
-        <Comments />
+        <Comments videoId={currentVideo._id}/>
       </Content>
       {/* <Recommendation>
         <Card type="sm" />
